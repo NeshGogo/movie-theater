@@ -15,6 +15,7 @@ namespace MovieTheater.DTOs
         public string Name { get; set; }
         public DateTime DateOfBirth { get; set; }
         [FileWeightValidation(3)]
+        [FileTypeValidation(FileTypeGroup.image)]
         public IFormFile PhotoFile { get; set; }
     }
 }

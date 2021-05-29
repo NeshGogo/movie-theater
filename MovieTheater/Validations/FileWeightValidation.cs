@@ -22,7 +22,7 @@ namespace MovieTheater.Validations
             var formFile = value as IFormFile;
             if (formFile == null) return ValidationResult.Success;
 
-            if (formFile.Length > (maxWeightInMb * (1024 ^ 2)))
+            if (formFile.Length > maxWeightInMb * 1024 * 1024)
             {
                 return new ValidationResult($"The weight of the file can't be higher than {maxWeightInMb}mb.");
             }
