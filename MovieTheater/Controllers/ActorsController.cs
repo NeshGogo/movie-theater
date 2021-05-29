@@ -45,7 +45,7 @@ namespace MovieTheater.Controllers
         {
             var actor = mapper.Map<Actor>(actorCreateDTO);
             await context.Actors.AddAsync(actor);
-            await context.SaveChangesAsync();
+            //await context.SaveChangesAsync();
             var actorDTO = mapper.Map<ActorDTO>(actor);
             return new CreatedAtRouteResult("GetActor", new { id = actorDTO.Id }, actorDTO);
         }
