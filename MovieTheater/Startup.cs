@@ -29,6 +29,9 @@ namespace MovieTheater
             // DbConetext
             services.AddDbContext<MovieTheaterDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("MovieTheaterDbConnectionString")));
+
+            // AutoMapper
+            services.AddAutoMapper(typeof(Startup));
             
             services.AddControllers();
         }
