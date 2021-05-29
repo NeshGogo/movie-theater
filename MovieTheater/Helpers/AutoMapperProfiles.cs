@@ -12,8 +12,12 @@ namespace MovieTheater.Helpers
     {
         public AutoMapperProfiles()
         {
+            // Gender
             CreateMap<Gender, GenderDTO>().ReverseMap();
             CreateMap<GenderCreateDTO, Gender>();
+            // Actor
+            CreateMap<Actor, ActorDTO>().ReverseMap();
+            CreateMap<ActorCreateDTO, Actor>();
         }
     }
 }
