@@ -27,14 +27,18 @@ namespace MovieTheater
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            
             // DbConetext
             services.AddDbContext<MovieTheaterDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("MovieTheaterDbConnectionString")));
             // AutoMapper
             services.AddAutoMapper(typeof(Startup));
             // AzureStorage
-            services.AddTransient<IFileStorage, FileStorageAzure>();
-            
+            // services.AddTransient<IFileStorage, FileStorageAzure>();
+            //File storage Local
+            services.AddTransient<IFileStorage, FileStorageLocal>();
+
+            services.AddHttpContextAccessor();
             services.AddControllers();
         }
 
@@ -47,7 +51,9 @@ namespace MovieTheater
             }
 
             app.UseHttpsRedirection();
-
+            
+            app.UseStaticFiles();
+            
             app.UseRouting();
 
             app.UseAuthorization();
