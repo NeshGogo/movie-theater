@@ -17,7 +17,8 @@ namespace MovieTheater.Helpers
             CreateMap<GenderCreateDTO, Gender>();
             // Actor
             CreateMap<Actor, ActorDTO>().ReverseMap();
-            CreateMap<ActorCreateDTO, Actor>();
+            CreateMap<ActorCreateDTO, Actor>()
+                .ForMember(a => a.Photo, options => options.Ignore());
         }
     }
 }

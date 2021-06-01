@@ -11,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using MovieTheater.Services;
 
 namespace MovieTheater
 {
@@ -29,9 +30,10 @@ namespace MovieTheater
             // DbConetext
             services.AddDbContext<MovieTheaterDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("MovieTheaterDbConnectionString")));
-
             // AutoMapper
             services.AddAutoMapper(typeof(Startup));
+            // AzureStorage
+            services.AddTransient<IFileStorage, FileStorageAzure>();
             
             services.AddControllers();
         }

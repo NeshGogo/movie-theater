@@ -3,8 +3,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MovieTheater.DTOs;
 using MovieTheater.Entities;
+using MovieTheater.Services;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -16,11 +18,14 @@ namespace MovieTheater.Controllers
     {
         private readonly MovieTheaterDbContext context;
         private readonly IMapper mapper;
+        private readonly IFileStorage fileStorage;
+        private readonly string container = "Actors";
 
-        public ActorsController(MovieTheaterDbContext context, IMapper mapper)
+        public ActorsController(MovieTheaterDbContext context, IMapper mapper, IFileStorage fileStorage)
         {
             this.context = context;
             this.mapper = mapper;
+            this.fileStorage = fileStorage;
         }
 
         [HttpGet]
@@ -44,6 +49,16 @@ namespace MovieTheater.Controllers
         public async Task<ActionResult> Post([FromForm] ActorCreateDTO actorCreateDTO)
         {
             var actor = mapper.Map<Actor>(actorCreateDTO);
+            if(actorCreateDTO.PhotoFile != null)
+            {
+                using (var memoryStream = new MemoryStream())
+                {
+                    await actorCreateDTO.PhotoFile.CopyToAsync(memoryStream);
+                    var content = memoryStream.ToArray();
+                    var extension = Path.GetExtension(actorCreateDTO.PhotoFile.FileName);
+                    actor.Photo = await fileStorage.SaveFileAsync(content, extension, container, actorCreateDTO.PhotoFile.ContentType);
+                }
+            }
             await context.Actors.AddAsync(actor);
             //await context.SaveChangesAsync();
             var actorDTO = mapper.Map<ActorDTO>(actor);
@@ -53,8 +68,19 @@ namespace MovieTheater.Controllers
         [HttpPut("{id:int}")]
         public async Task<ActionResult> Put(int id, [FromForm] ActorCreateDTO actorCreateDTO)
         {
-            var actor = mapper.Map<Actor>(actorCreateDTO);
-            actor.Id = id;
+            var actor = await context.Actors.FindAsync(id);
+            if (actor == null) return NotFound();
+            actor = mapper.Map(actorCreateDTO, actor);
+            if (actorCreateDTO.PhotoFile != null)
+            {
+                using (var memoryStream = new MemoryStream())
+                {
+                    await actorCreateDTO.PhotoFile.CopyToAsync(memoryStream);
+                    var content = memoryStream.ToArray();
+                    var extension = Path.GetExtension(actorCreateDTO.PhotoFile.FileName);
+                    actor.Photo = await fileStorage.EditFileAsync(content, extension, container, actor.Photo, actorCreateDTO.PhotoFile.ContentType);
+                }
+            }
             context.Actors.Update(actor);
             await context.SaveChangesAsync();
             return NoContent();
