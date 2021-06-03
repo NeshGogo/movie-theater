@@ -8,12 +8,9 @@ using System.Threading.Tasks;
 
 namespace MovieTheater.DTOs
 {
-    public class ActorCreateDTO
+    public class ActorCreateDTO : ActorPatchDTO
     {
-        [Required]
-        [StringLength(120)]
-        public string Name { get; set; }
-        public DateTime DateOfBirth { get; set; }
+
         [FileWeightValidation(3)]
         [FileTypeValidation(FileTypeGroup.image)]
         public IFormFile PhotoFile { get; set; }

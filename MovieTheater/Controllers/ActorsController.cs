@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MovieTheater.DTOs;
@@ -82,6 +83,21 @@ namespace MovieTheater.Controllers
                 }
             }
             context.Actors.Update(actor);
+            await context.SaveChangesAsync();
+            return NoContent();
+        }
+
+        [HttpPatch("{id:int}")]
+        public async Task<ActionResult> Patch(int id, [FromBody] JsonPatchDocument<ActorPatchDTO> patchDocument)
+        {
+            if (patchDocument == null) return BadRequest();
+            var actor = await context.Actors.FirstOrDefaultAsync(a => a.Id == id);
+            if (actor == null) return NotFound();
+            var actorPatchDTO = mapper.Map<ActorPatchDTO>(actor);
+            patchDocument.ApplyTo(actorPatchDTO, ModelState);
+            var isValid = TryValidateModel(actorPatchDTO);
+            if (!isValid) return BadRequest(ModelState);
+            mapper.Map(actorPatchDTO, actor);
             await context.SaveChangesAsync();
             return NoContent();
         }
