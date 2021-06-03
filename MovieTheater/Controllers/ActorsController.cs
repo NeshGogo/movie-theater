@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MovieTheater.DTOs;
 using MovieTheater.Entities;
+using MovieTheater.Helpers;
 using MovieTheater.Services;
 using System;
 using System.Collections.Generic;
@@ -30,9 +31,11 @@ namespace MovieTheater.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<ActorDTO>>> Get()
+        public async Task<ActionResult<List<ActorDTO>>> Get([FromQuery] PaginationDTO pagination)
         {
-            var actors = await context.Actors.ToListAsync();
+            var queryable = context.Actors.AsQueryable();
+            await HttpContext.InsertPaginationParams(queryable, pagination.RecordPerPage);
+            var actors = await queryable.Pagination(pagination).ToListAsync();
             var actorDTOs = mapper.Map<List<ActorDTO>>(actors);
             return actorDTOs;
         }
@@ -61,7 +64,7 @@ namespace MovieTheater.Controllers
                 }
             }
             await context.Actors.AddAsync(actor);
-            //await context.SaveChangesAsync();
+            await context.SaveChangesAsync();
             var actorDTO = mapper.Map<ActorDTO>(actor);
             return new CreatedAtRouteResult("GetActor", new { id = actorDTO.Id }, actorDTO);
         }
