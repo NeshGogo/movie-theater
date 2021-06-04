@@ -23,8 +23,28 @@ namespace MovieTheater.Helpers
             //Movie
             CreateMap<Movie, MovieDTO>().ReverseMap();
             CreateMap<MovieCreateDTO, Movie>()
-                .ForMember(a => a.Poster, options => options.Ignore());
+                .ForMember(a => a.Poster, options => options.Ignore())
+                .ForMember(x => x.MovieGenders, options => options.MapFrom(MapMovieGenders))
+                .ForMember(x => x.MovieActors, options => options.MapFrom(MapMovieActors));
+
+
             CreateMap<Movie, MoviePatchDTO>().ReverseMap();
         }
+
+        private List<MovieGender> MapMovieGenders(MovieCreateDTO movieCreateDTO, Movie movie)
+        {
+            var result = new List<MovieGender>();
+            if (movieCreateDTO.GenderIds == null) return result;
+            movieCreateDTO.GenderIds.ForEach(id => result.Add(new MovieGender { GenderId = id }));
+            return result;
+        }
+        private List<MovieActor> MapMovieActors(MovieCreateDTO movieCreateDTO, Movie movie)
+        {
+            var result = new List<MovieActor>();
+            if (movieCreateDTO.GenderIds == null) return result;
+            movieCreateDTO.Actors.ForEach(actor => 
+                result.Add(new MovieActor { ActorId = actor.ActorId, Character = actor.Character }));
+            return result;
+        } 
     }
 }

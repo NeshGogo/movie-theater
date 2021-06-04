@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using MovieTheater.Helpers;
 using MovieTheater.Validations;
 using System;
 using System.Collections.Generic;
@@ -14,7 +16,9 @@ namespace MovieTheater.DTOs
         [FileTypeValidation(FileTypeGroup.image)]
         [FileWeightValidation(4)]
         public IFormFile Poster { get; set; }
-
+        [ModelBinder(BinderType = typeof(TypeBinder<List<int>>))]
         public List<int> GenderIds { get; set; }
+        [ModelBinder(BinderType = typeof(TypeBinder<List<MovieActorCreateDTO>>))]
+        public List<MovieActorCreateDTO> Actors { get; set; }
     }
 }

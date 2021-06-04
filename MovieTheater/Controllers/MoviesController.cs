@@ -59,6 +59,7 @@ namespace MovieTheater.Controllers
                     movie.Poster = await fileStorage.SaveFileAsync(content, extension, container, movieCreateDTO.Poster.ContentType);
                 }
             }
+            AsignOrderToActors(movie);
             await context.Movies.AddAsync(movie);
             await context.SaveChangesAsync();
             var movieDTO = mapper.Map<MovieDTO>(movie);
@@ -68,7 +69,10 @@ namespace MovieTheater.Controllers
         [HttpPut("{id:int}")]
         public async Task<ActionResult> Put(int id, [FromForm] MovieCreateDTO movieCreateDTO)
         {
-            var movie = await context.Movies.FindAsync(id);
+            var movie = await context.Movies
+                .Include(m => m.MovieActors)
+                .Include(m => m.MovieGenders)
+                .FirstOrDefaultAsync(m => m.Id == id);
             if (movie == null) return NotFound();
             movie = mapper.Map(movieCreateDTO, movie);
             if (movieCreateDTO.Poster != null)
@@ -81,6 +85,7 @@ namespace MovieTheater.Controllers
                     movie.Poster = await fileStorage.SaveFileAsync(content, extension, container, movieCreateDTO.Poster.ContentType);
                 }
             }
+            AsignOrderToActors(movie);
             await context.SaveChangesAsync();
             return NoContent();
         }
@@ -107,6 +112,18 @@ namespace MovieTheater.Controllers
             context.Movies.Remove(new Movie { Id = id });
             await context.SaveChangesAsync();
             return NoContent();
+        }
+
+        private void AsignOrderToActors(Movie movie)
+        {
+            var length = movie.MovieActors.Count;
+            if ( length > 0)
+            {
+                for (int i = 0; i < movie.MovieActors.Count; i++)
+                {
+                    movie.MovieActors[i].Order = i;
+                }
+            }
         }
     }
 }

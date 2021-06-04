@@ -12,5 +12,6 @@ namespace MovieTheater.Entities
         [Required]
         [StringLength(40)]
         public string Name { get; set; }
+        public List<MovieGender> MovieGenders { get; set; }
     }
 }
