@@ -13,9 +13,19 @@ namespace MovieTheater
         {
 
         }
-
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<MovieActor>()
+                .HasKey(ma => new { ma.ActorId, ma.MovieId });
+            modelBuilder.Entity<MovieGender>()
+                .HasKey(ma => new { ma.GenderId, ma.MovieId });
+            
+            base.OnModelCreating(modelBuilder);
+        }
         public DbSet<Gender> Genders { get; set; }
         public DbSet<Actor> Actors { get; set; }
         public DbSet<Movie> Movies { get; set; }
+        public DbSet<MovieActor> MovieActors { get; set; }
+        public DbSet<MovieGender> MovieGenders { get; set; }
     }
 }

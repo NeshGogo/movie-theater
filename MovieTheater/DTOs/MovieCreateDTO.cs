@@ -14,5 +14,7 @@ namespace MovieTheater.DTOs
         [FileTypeValidation(FileTypeGroup.image)]
         [FileWeightValidation(4)]
         public IFormFile Poster { get; set; }
+
+        public List<int> GenderIds { get; set; }
     }
 }
