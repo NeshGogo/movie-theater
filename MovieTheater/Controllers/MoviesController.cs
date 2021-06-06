@@ -13,6 +13,7 @@ using MovieTheater.Entities;
 using MovieTheater.Helpers;
 using MovieTheater.Services;
 using System.Linq.Dynamic.Core;
+using Microsoft.Extensions.Logging;
 
 namespace MovieTheater.Controllers
 {
@@ -24,12 +25,18 @@ namespace MovieTheater.Controllers
         private readonly IMapper mapper;
         private readonly IFileStorage fileStorage;
         private readonly string container = "Movies";
+        private readonly ILogger<MoviesController> logger;
 
-        public MoviesController(MovieTheaterDbContext context, IMapper mapper, IFileStorage fileStorage)
+        public MoviesController(
+            MovieTheaterDbContext context, 
+            IMapper mapper, 
+            IFileStorage fileStorage,
+            ILogger<MoviesController> logger)
         {
             this.context = context;
             this.mapper = mapper;
             this.fileStorage = fileStorage;
+            this.logger = logger;
         }
 
         [HttpGet]
@@ -85,7 +92,15 @@ namespace MovieTheater.Controllers
             if (!string.IsNullOrEmpty(movieFilter.OrderField))
             {
                 var typeOrder = movieFilter.OrderByAsc ? "ascending" : "descending";
-                moviesQueryable = moviesQueryable.OrderBy($"{movieFilter.OrderField} {typeOrder}");
+                try
+                {
+                    moviesQueryable = moviesQueryable.OrderBy($"{movieFilter.OrderField} {typeOrder}");
+                }
+                catch (Exception ex)
+                {
+                    logger.LogError(ex.Message, ex);
+                }
+                
             }
 
             await HttpContext.InsertPaginationParams(moviesQueryable, movieFilter.RecordPerPage);
