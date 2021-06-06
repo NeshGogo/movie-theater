@@ -22,5 +22,7 @@ namespace MovieTheater.DTOs
         public int GenderId { get; set; }
         public bool AtCinema { get; set; }
         public bool NextPremier { get; set; }
+        public string OrderField { get; set; }
+        public bool OrderByAsc { get; set; } = true;
     }
 }

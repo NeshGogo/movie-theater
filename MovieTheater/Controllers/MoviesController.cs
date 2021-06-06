@@ -12,6 +12,7 @@ using MovieTheater.DTOs;
 using MovieTheater.Entities;
 using MovieTheater.Helpers;
 using MovieTheater.Services;
+using System.Linq.Dynamic.Core;
 
 namespace MovieTheater.Controllers
 {
@@ -80,6 +81,13 @@ namespace MovieTheater.Controllers
                     .Where(m => m.MovieGenders.Select( mg => mg.GenderId)
                     .Contains(movieFilter.GenderId));
             }
+
+            if (!string.IsNullOrEmpty(movieFilter.OrderField))
+            {
+                var typeOrder = movieFilter.OrderByAsc ? "ascending" : "descending";
+                moviesQueryable = moviesQueryable.OrderBy($"{movieFilter.OrderField} {typeOrder}");
+            }
+
             await HttpContext.InsertPaginationParams(moviesQueryable, movieFilter.RecordPerPage);
             var movieDTOS = await moviesQueryable.Pagination(movieFilter.Pagination).ToListAsync();
             return mapper.Map<List<MovieDTO>>(movieDTOS);
