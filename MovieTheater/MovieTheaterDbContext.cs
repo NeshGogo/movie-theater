@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MovieTheater.Entities;
+using NetTopologySuite;
+using NetTopologySuite.Geometries;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -114,6 +116,17 @@ namespace MovieTheater
                     new MovieActor(){MovieId = iw.Id, ActorId = chrisEvans.Id, Character = "Steve Rogers", Order = 2},
                     new MovieActor(){MovieId = sonic.Id, ActorId = jimCarrey.Id, Character = "Dr. Ivo Robotnik", Order = 1}
                 });
+            
+            var geometryFactory = NtsGeometryServices.Instance.CreateGeometryFactory(srid: 4326);
+
+            modelBuilder.Entity<Cinema>()
+               .HasData(new List<Cinema>
+               {
+                    //new Cinema{Id = 1, Name = "Agora", Location = geometryFactory.CreatePoint(new Coordinate(-69.9388777, 18.4839233))},
+                    new Cinema{Id = 4, Name = "Sambil", Location = geometryFactory.CreatePoint(new Coordinate(-69.9118804, 18.4826214))},
+                    new Cinema{Id = 5, Name = "Megacentro", Location = geometryFactory.CreatePoint(new Coordinate(-69.856427, 18.506934))},
+                    new Cinema{Id = 6, Name = "Village East Cinema", Location = geometryFactory.CreatePoint(new Coordinate(-73.986227, 40.730898))}
+               });
         }
 
         public DbSet<Gender> Genders { get; set; }

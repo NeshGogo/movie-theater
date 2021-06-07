@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using MovieTheater.DTOs;
 using MovieTheater.Entities;
+using NetTopologySuite.Geometries;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,8 +16,17 @@ namespace MovieTheater.Controllers
     [Route("api/cinemas")]
     public class CinemasController : CustomBaseController
     {
-        public CinemasController(MovieTheaterDbContext context, IMapper mapper)
-            : base(context, mapper){}
+        private readonly MovieTheaterDbContext context;
+        private readonly IMapper mapper;
+        private readonly GeometryFactory geometryFactory;
+
+        public CinemasController(MovieTheaterDbContext context, IMapper mapper, GeometryFactory geometryFactory)
+            : base(context, mapper)
+        {
+            this.context = context;
+            this.mapper = mapper;
+            this.geometryFactory = geometryFactory;
+        }
 
         [HttpGet]
         public async Task<ActionResult<List<CinemaDTO>>> Get()
@@ -28,6 +39,24 @@ namespace MovieTheater.Controllers
         {
             return await Get<Cinema, CinemaDTO>(id);
         }
+
+        [HttpGet("nearby")]
+        public async Task<ActionResult<List<CinemaNearbyDTO>>> Nearby([FromQuery] CinemaNearbyFilterDTO filter)
+        {
+            var userLocation = geometryFactory.CreatePoint(new Coordinate(filter.Longitude, filter.Latitude));
+            return await context.Cinemas
+                .Where(c => c.Location.IsWithinDistance(userLocation, filter.DistanceInKms * 1000))
+                .OrderBy(c => c.Location.Distance(userLocation))
+                .Select(c => new CinemaNearbyDTO
+                {
+                    Name = c.Name,
+                    Id = c.Id,
+                    Latitude = c.Location.Y,
+                    Longitude = c.Location.X,
+                    DistanceInMeters = Math.Round(c.Location.Distance(userLocation))
+                }).ToListAsync();
+        }
+
 
         [HttpPost]
         public async Task<ActionResult> Post([FromBody] CinemaCreateDTO cinemaCreateDTO)
