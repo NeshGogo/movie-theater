@@ -30,6 +30,9 @@ namespace MovieTheater.Helpers
             CreateMap<Movie, MovieDetailDTO>()
                 .ForMember(x => x.Genders, options => options.MapFrom(MapMovieGenderDetail))
                 .ForMember(x => x.Arctors, options => options.MapFrom(MapMovieActorDetail));
+            //Cinema
+            CreateMap<Cinema, CinemaDTO>().ReverseMap();
+            CreateMap<CinemaCreateDTO, Cinema>();
         }
 
         private List<MovieGender> MapMovieGenders(MovieCreateDTO movieCreateDTO, Movie movie)

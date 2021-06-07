@@ -17,5 +17,6 @@ namespace MovieTheater.Entities
         public DateTime PremiereDate { get; set; }
         public List<MovieActor> MovieActors { get; set; }
         public List<MovieGender> MovieGenders { get; set; }
+        public List<MovieCinema> MovieCinemas { get; set; }
     }
 }

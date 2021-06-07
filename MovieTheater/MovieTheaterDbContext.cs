@@ -19,7 +19,9 @@ namespace MovieTheater
                 .HasKey(ma => new { ma.ActorId, ma.MovieId });
             modelBuilder.Entity<MovieGender>()
                 .HasKey(ma => new { ma.GenderId, ma.MovieId });
-           
+            modelBuilder.Entity<MovieCinema>()
+                .HasKey(ma => new { ma.CinemaId, ma.MovieId });
+
             SeedData(modelBuilder);
             
             base.OnModelCreating(modelBuilder);
@@ -119,5 +121,7 @@ namespace MovieTheater
         public DbSet<Movie> Movies { get; set; }
         public DbSet<MovieActor> MovieActors { get; set; }
         public DbSet<MovieGender> MovieGenders { get; set; }
+        public DbSet<Cinema> Cinemas { get; set; }
+        public DbSet<MovieCinema> MovieCinemas { get; set; }
     }
 }
