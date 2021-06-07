@@ -19,7 +19,7 @@ namespace MovieTheater.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class MoviesController : ControllerBase
+    public class MoviesController : CustomBaseController
     {
         private readonly MovieTheaterDbContext context;
         private readonly IMapper mapper;
@@ -32,6 +32,7 @@ namespace MovieTheater.Controllers
             IMapper mapper, 
             IFileStorage fileStorage,
             ILogger<MoviesController> logger)
+            : base(context, mapper)
         {
             this.context = context;
             this.mapper = mapper;
@@ -170,25 +171,12 @@ namespace MovieTheater.Controllers
         [HttpPatch("{id:int}")]
         public async Task<ActionResult> Patch(int id, [FromBody] JsonPatchDocument<MoviePatchDTO> jsonPatchDocument)
         {
-            if (jsonPatchDocument == null) return BadRequest();
-            var movie = await context.Movies.FindAsync(id);
-            if (movie == null) return NotFound();
-            var moviePatchDTO = mapper.Map<MoviePatchDTO>(movie);
-            jsonPatchDocument.ApplyTo(moviePatchDTO, ModelState);
-            var isValid = TryValidateModel(moviePatchDTO);
-            if (!isValid) return BadRequest(ModelState);
-            mapper.Map(moviePatchDTO, movie);
-            await context.SaveChangesAsync();
-            return NoContent();
+            return await Patch<Movie, MoviePatchDTO>(id, jsonPatchDocument);
         }
 
         [HttpDelete("{id:int}")]
         public async Task<ActionResult> Delete(int id){
-            var exists = await context.Movies.AnyAsync(a => a.Id == id);
-            if (!exists) return NotFound();
-            context.Movies.Remove(new Movie { Id = id });
-            await context.SaveChangesAsync();
-            return NoContent();
+            return await Delete<Movie>(id);
         }
 
         private void AsignOrderToActors(Movie movie)
@@ -198,7 +186,7 @@ namespace MovieTheater.Controllers
             {
                 for (int i = 0; i < movie.MovieActors.Count; i++)
                 {
-                    movie.MovieActors[i].Order = i;
+                    movie.MovieActors[i].Order = i + 1;
                 }
             }
         }
