@@ -5,12 +5,14 @@ using System.Threading.Tasks;
 using AutoMapper;
 using MovieTheater.DTOs;
 using MovieTheater.Entities;
+using NetTopologySuite;
+using NetTopologySuite.Geometries;
 
 namespace MovieTheater.Helpers
 {
     public class AutoMapperProfiles : Profile
     {
-        public AutoMapperProfiles()
+        public AutoMapperProfiles( GeometryFactory geometryFactory)
         {
             // Gender
             CreateMap<Gender, GenderDTO>().ReverseMap();
@@ -31,8 +33,15 @@ namespace MovieTheater.Helpers
                 .ForMember(x => x.Genders, options => options.MapFrom(MapMovieGenderDetail))
                 .ForMember(x => x.Arctors, options => options.MapFrom(MapMovieActorDetail));
             //Cinema
-            CreateMap<Cinema, CinemaDTO>().ReverseMap();
-            CreateMap<CinemaCreateDTO, Cinema>();
+            CreateMap<Cinema, CinemaDTO>()
+                .ForMember(x => x.Latitude, x => x.MapFrom(y => y.Location.Y))
+                .ForMember(x => x.Longitude, x => x.MapFrom(y => y.Location.X));
+            CreateMap<CinemaDTO, Cinema>()
+                .ForMember(x => x.Location, x => x.MapFrom(y =>
+                    geometryFactory.CreatePoint(new Coordinate(y.Longitude, y.Latitude))));
+            CreateMap<CinemaCreateDTO, Cinema>()
+                .ForMember(x => x.Location, x => x.MapFrom(y =>
+                    geometryFactory.CreatePoint(new Coordinate(y.Longitude, y.Latitude))));
         }
 
         private List<MovieGender> MapMovieGenders(MovieCreateDTO movieCreateDTO, Movie movie)
