@@ -40,6 +40,11 @@ namespace MovieTheater.Controllers
         protected async Task<List<TDTO>> Get<TEntity, TDTO>(PaginationDTO pagination) where TEntity : class
         {
             var queryable = context.Set<TEntity>().AsQueryable();
+            return await Get<TEntity, TDTO>(pagination, queryable);
+        }
+
+        protected async Task<List<TDTO>> Get<TEntity, TDTO>(PaginationDTO pagination, IQueryable<TEntity> queryable) where TEntity : class
+        {
             await HttpContext.InsertPaginationParams(queryable, pagination.RecordPerPage);
             var entities = await queryable.Pagination(pagination).ToListAsync();
             return mapper.Map<List<TDTO>>(entities);

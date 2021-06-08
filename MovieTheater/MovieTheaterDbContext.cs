@@ -164,5 +164,6 @@ namespace MovieTheater
         public DbSet<MovieGender> MovieGenders { get; set; }
         public DbSet<Cinema> Cinemas { get; set; }
         public DbSet<MovieCinema> MovieCinemas { get; set; }
+        public DbSet<Review> Reviews { get; set; }
     }
 }

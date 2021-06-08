@@ -45,6 +45,11 @@ namespace MovieTheater.Helpers
                     geometryFactory.CreatePoint(new Coordinate(y.Longitude, y.Latitude))));
             // User
             CreateMap<IdentityUser, UserDTO>();
+            // Review
+            CreateMap<Review, ReviewDTO>()
+                .ForMember(x => x.UserName, options => options.MapFrom(x => x.User.UserName));
+            CreateMap<ReviewDTO, Review>();
+            CreateMap<ReviewCreateDTO, Review>();
         }
 
         private List<MovieGender> MapMovieGenders(MovieCreateDTO movieCreateDTO, Movie movie)
