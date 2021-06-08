@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using MovieTheater.Entities;
 using NetTopologySuite;
 using NetTopologySuite.Geometries;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace MovieTheater
 {
-    public class MovieTheaterDbContext : DbContext
+    public class MovieTheaterDbContext : IdentityDbContext
     {
         public MovieTheaterDbContext( DbContextOptions options) : base(options)
         {
