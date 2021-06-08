@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MovieTheater.DTOs;
 using MovieTheater.Entities;
+using MovieTheater.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +17,7 @@ namespace MovieTheater.Controllers
 {
     [Route("api/movies/{MovieId:int}/reviews")]
     [ApiController]
+    [ServiceFilter(typeof(MovieExistsAttribute))]
     public class ReviewsController : CustomBaseController
     {
         private readonly MovieTheaterDbContext context;
@@ -41,8 +43,6 @@ namespace MovieTheater.Controllers
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult> Post(int movieId, [FromBody] ReviewCreateDTO reviewCreate)
         {
-            var MovieExists = await context.Movies.AnyAsync(m => m.Id == movieId);
-            if (!MovieExists) return NotFound();
             var userId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier).Value;
             var reviewExists = await context.Reviews.AnyAsync(r => r.MovieId == movieId && r.UserId == userId);
             if (reviewExists) return BadRequest("The user already wrote a review in this movie.");
@@ -58,12 +58,10 @@ namespace MovieTheater.Controllers
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult> Put(int movieId, int reviewId, [FromBody] ReviewCreateDTO reviewCreate)
         {
-            var movieExists = await context.Movies.AnyAsync(m => m.Id == movieId);
-            if (!movieExists) return NotFound();
             var userId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier).Value;
             var reviewDb = await context.Reviews.FindAsync(reviewId);
             if (reviewDb == null) return NotFound();
-            if (reviewDb.UserId != userId) return Forbid();
+            if (reviewDb.UserId != userId) return BadRequest("Your are not allowed to edit this review.");
             mapper.Map(reviewCreate, reviewDb);
             await context.SaveChangesAsync();
             return NoContent();
@@ -73,12 +71,10 @@ namespace MovieTheater.Controllers
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult> Delete(int movieId, int reviewId)
         {
-            var movieExists = await context.Movies.AnyAsync(m => m.Id == movieId);
-            if (!movieExists) return NotFound();
             var userId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier).Value;
             var reviewDb = await context.Reviews.FindAsync(reviewId);
             if (reviewDb == null) return NotFound();
-            if (reviewDb.UserId != userId) return Forbid();
+            if (reviewDb.UserId != userId) return BadRequest("Your are not allowed to delete this review.");
             context.Reviews.Remove(reviewDb);
             await context.SaveChangesAsync();
             return NoContent();
