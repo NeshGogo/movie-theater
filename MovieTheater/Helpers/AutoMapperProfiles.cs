@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.AspNetCore.Identity;
 using MovieTheater.DTOs;
 using MovieTheater.Entities;
 using NetTopologySuite;
@@ -42,6 +43,8 @@ namespace MovieTheater.Helpers
             CreateMap<CinemaCreateDTO, Cinema>()
                 .ForMember(x => x.Location, x => x.MapFrom(y =>
                     geometryFactory.CreatePoint(new Coordinate(y.Longitude, y.Latitude))));
+            // User
+            CreateMap<IdentityUser, UserDTO>();
         }
 
         private List<MovieGender> MapMovieGenders(MovieCreateDTO movieCreateDTO, Movie movie)

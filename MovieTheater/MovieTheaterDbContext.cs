@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using MovieTheater.Entities;
 using NetTopologySuite;
@@ -6,6 +7,7 @@ using NetTopologySuite.Geometries;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace MovieTheater
@@ -31,6 +33,31 @@ namespace MovieTheater
         }
         private void SeedData(ModelBuilder modelBuilder)
         {
+            var roleAdminId = Guid.NewGuid().ToString();
+            var userAdminId = Guid.NewGuid().ToString();
+            var roleAdmin = new IdentityRole { Id = roleAdminId, Name = "Admin", NormalizedName = "Admin" };
+            var passwordHasher = new PasswordHasher<IdentityUser>();
+            var userAdminEmail = "neshgogo@hotmail.com";
+            var userAdmin = new IdentityUser 
+            { 
+                UserName = userAdminEmail, 
+                Id = userAdminId, 
+                Email = userAdminEmail,
+                NormalizedEmail = userAdminEmail, 
+                NormalizedUserName = userAdminEmail ,
+                PasswordHash = passwordHasher.HashPassword(null, "123456")
+            };
+            /*modelBuilder.Entity<IdentityUser>().HasData(userAdmin);
+            modelBuilder.Entity<IdentityRole>().HasData(roleAdmin);
+            modelBuilder.Entity<IdentityUserClaim<string>>()
+                .HasData(new IdentityUserClaim<string>
+                {
+                    Id = 1,
+                    ClaimType = ClaimTypes.Role,
+                    UserId = userAdminId,
+                    ClaimValue = "Admin"
+                });*/
+
             var adventure = new Gender { Id = 4, Name = "Adventure" };
             var animation = new Gender { Id = 5, Name = "Animation" };
             var suspense = new Gender { Id = 6, Name = "Suspense" };
