@@ -17,7 +17,7 @@ namespace MovieTheater.Test
             return new MovieTheaterDbContext(options);
         }
 
-        protected IMapper AutoMapperConfigure()
+        protected IMapper ConfigureAutoMapper()
         {
             var config = new MapperConfiguration(options =>
            {
