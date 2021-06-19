@@ -57,15 +57,19 @@ namespace MovieTheater.Test
         {
             var factory = new WebApplicationFactory<Startup>();
             
-            factory.WithWebHostBuilder(builder =>
+            factory = factory.WithWebHostBuilder(builder =>
             {
                 builder.ConfigureTestServices(services =>
                 {
                     var descriptorDbContext = services.SingleOrDefault(d =>
                    d.ServiceType == typeof(DbContextOptions<MovieTheaterDbContext>));
-                    if (descriptorDbContext != null) services.Remove(descriptorDbContext);
 
-                    if (!securityIgnore)
+                    if (descriptorDbContext != null) services.Remove(descriptorDbContext);                    
+                    
+                    services.AddDbContext<MovieTheaterDbContext>(options => 
+                        options.UseInMemoryDatabase(dbName));
+                    
+                    if (securityIgnore)
                     {
                        services.AddSingleton<IAuthorizationHandler, AllowAnonymousHandler>();
                        services.AddControllers(options =>
