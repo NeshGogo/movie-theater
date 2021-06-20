@@ -76,7 +76,10 @@ namespace MovieTheater
                 );
 
             services.AddHttpContextAccessor();
-            services.AddControllers()
+            services.AddControllers(options => 
+            {
+                options.Filters.Add(typeof(ExceptionFilter));
+            })
                     .AddNewtonsoftJson();
             services.AddApplicationInsightsTelemetry(Configuration["APPINSIGHTS_CONNECTIONSTRING"]);
         }
